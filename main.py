@@ -26,8 +26,14 @@ async def websocket_endpoint(websocket: WebSocket, client_id: int):
     await manager.user_join_room(websocket, client_id)
     try:
         while True:
-            data = await websocket.receive_text()
-            await command(data, websocket, client_id)
+            data = await websocket.receive()
+            print(data)
+            if 'text' in data:
+                text = data['text']
+            else :
+                text = data['bytes'].decode('UTF-8')
+                
+            await command(text, websocket, client_id)
     except WebSocketDisconnect:
         manager.disconnect(websocket)
         await manager.broadcast(f"Client #{client_id} left the chat", client_id)
